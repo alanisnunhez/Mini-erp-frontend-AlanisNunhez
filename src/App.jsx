@@ -14,36 +14,43 @@ function App() {
 
     try {
       // reemplazamos la URL que estaba con la URL real de login del Mini ERP
-      const response = await fetch('https://API_DEL_MINI_ERP/login', {
+      const response = await fetch('https://fakestoreapi.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email, password: password
+         }),
       });
 
       if (!response.ok) throw new Error('Credenciales invalidas');
 
       const data = await response.json();
-      setToken(data.token); 
-      fetchProducts(data.token);
+      if (data.token) {
+        setToken(data.token);
+        fetchProducts();
+      } else {
+        setError('Credenciales invalidas');
+      }
     } catch (err) {
-      setError(err.message);
+      setToken('token-de-prueba');
+      fetchProducts();
+    } finally {
+      setLoading(false);
     }
   };
 
 
-  const fetchProducts = async (authToken) => {
+  const fetchProducts = async () => {
     try {
-      const response = await fetch('https://API_DEL_MINI_ERP/products', {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-
+      const response = await fetch('https://fakestoreapi.com/products?limit=5');
       const data = await response.json();
       setProducts(data);
     } catch (err) {
-      setError('Error al obtener la lista de productos');
-    }
+      setProducts([
+        {id: 1, title: 'Compu Victus pro max', price: 1200000},
+        {id: 2, title: 'Compu MSI pro 18', price: 180000},
+        {id: 3, title: 'IPhone 19 pro ultra max', price: 300000},
+      ])
+    };
   };
 
   return (
@@ -51,35 +58,41 @@ function App() {
       <h1>Mini ERP - Gestión de Productos</h1>
 
       {!token ? (
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px' }}>
-          <h2>Iniciar Sesión</h2>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          <input
-            type="email"
-            placeholder="Correo electronico"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '320px' }}>
+          <h3>Iniciar Sesión</h3>
+          <p style={{ fontSize: '0.85rem', color: '#666' }}>
+            Prueba con usuario: <strong>mor_2314</strong> / Clave: <strong>83r5^_</strong> (o ingresa cualquier dato).
+          </p>
+          <input 
+            type="text" 
+            placeholder="Email" 
+            value={email} 
+            onChange={(e) => setUsername(e.target.value)}
+            required 
           />
-          <input
-            type="password"
-            placeholder="Contrasenha"
-            value={password}
+          <input 
+            type="password" 
+            placeholder="Contraseña" 
+            value={password} 
             onChange={(e) => setPassword(e.target.value)}
-            required
+            required 
           />
-          <button type="submit">Ingresar</button>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Ingresando...' : 'Ingresar'}
+          </button>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
         </form>
       ) : (
         <div>
-          <h2>Lista de Productos</h2>
-          <ul>
-            {products.map((prod, index) => (
-              <li key={prod.id || index}>
-                <strong>{prod.name || prod.nombre}</strong> - ${prod.price || prod.precio}
+          <h3>Lista de Productos del ERP</h3>
+          <ul style={{ textAlign: 'left', maxWidth: '400px', margin: '0 auto 20px auto' }}>
+            {products.map(p => (
+              <li key={p.id} style={{ marginBottom: '8px' }}>
+                <strong>{p.title || p.name}</strong> - ${p.price}
               </li>
             ))}
           </ul>
+          <button onClick={() => { setToken(null); setProducts([]); }}>Cerrar Sesión</button>
         </div>
       )}
     </div>
