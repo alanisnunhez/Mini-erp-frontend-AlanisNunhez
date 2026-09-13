@@ -15,7 +15,6 @@ function App() {
     setLoading(true);
 
     try {
-      // Petición a la API de autenticación
       const response = await fetch('https://fakestoreapi.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -25,7 +24,7 @@ function App() {
         }),
       });
 
-      if (!response.ok) throw new Error('Credenciales inválidas');
+      if (!response.ok) throw new Error('Credenciales invalidas');
 
       const data = await response.json();
       if (data.token) {
@@ -35,7 +34,6 @@ function App() {
         setError('Credenciales inválidas');
       }
     } catch (err) {
-      // Respaldo automático si falla la API
       setToken('token-de-prueba');
       fetchProducts();
     } finally {
@@ -49,7 +47,6 @@ function App() {
       const data = await response.json();
       setProducts(data);
     } catch (err) {
-      // Datos de respaldo personalizados
       setProducts([
         { id: 1, title: 'Compu Victus pro max', price: 1200000 },
         { id: 2, title: 'Compu MSI pro 18', price: 180000 },
@@ -65,9 +62,6 @@ function App() {
       {!token ? (
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '320px', margin: '0 auto' }}>
           <h3>Iniciar Sesión</h3>
-          <p style={{ fontSize: '0.85rem', color: '#666' }}>
-            Prueba con usuario: <strong>mor_2314</strong> / Clave: <strong>83r5^_</strong> (o ingresa cualquier dato).
-          </p>
           <input 
             type="text" 
             placeholder="Email / Usuario" 
