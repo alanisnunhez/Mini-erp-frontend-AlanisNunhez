@@ -64,7 +64,7 @@ function App() {
           <h3>Iniciar Sesión</h3>
           <input 
             type="text" 
-            placeholder="Email / Usuario" 
+            placeholder="Email o Correo" 
             value={email} 
             onChange={(e) => setEmail(e.target.value)}
             required 
